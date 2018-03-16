@@ -9,6 +9,7 @@ ADD . /app
 
 # Install any needed packages specified in requirements.txt
 RUN pip3 install -r requirements.txt
+RUN python3 setup_model.py
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
@@ -17,4 +18,4 @@ EXPOSE 5000
 ENV NAME World
 
 # Run app.py when the container launches
-CMD ["python", "api.py"]
+CMD ["python3", "api.py"]

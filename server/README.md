@@ -1,9 +1,9 @@
 # Create container
 docker build -t samplehello .
-# Remove container
-docker rmi containerid --force
+# Remove image
+docker rmi imageid --force
 # Run container
-docker run samplehello
+docker run -p 5000:5000 samplehello
 # Start container
 docker start samplehello
 # Stop Container
