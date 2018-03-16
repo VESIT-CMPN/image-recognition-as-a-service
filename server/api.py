@@ -1,19 +1,3 @@
-
-# import tensorflow as tf
-
-# app = Flask(__name__)
-# api = Api(app)
-
-# class HelloWorld(Resource):
-#     def get(self):
-#         return {'hello': 'world'}
-
-# api.add_resource(HelloWorld, '/')
-
-# if __name__ == '__main__':
-
-#     app.run(debug=True)
-
 # Copyright 2015 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,9 +40,10 @@ import numpy as np
 from six.moves import urllib
 import tensorflow as tf
 
-from flask import Flask
+from flask import Flask, request
 from flask_restful import Resource, Api
 from collections import OrderedDict
+import base64
 
 FLAGS = None
 
@@ -70,12 +55,15 @@ app = Flask(__name__)
 api = Api(app)
 
 class HelloWorld(Resource):
-    def get(self):
+    def get(self, imgb64, ranks):
+        image_64_decode = base64.urlsafe_b64decode(imgb64) 
+        with open('{}/panda_decode.jpg'.format(FLAGS.model_dir), 'wb') as f: # create a writable image and write the decoding result
+            f.write(image_64_decode)
         image = (FLAGS.image_file if FLAGS.image_file else
-            os.path.join(FLAGS.model_dir, 'cropped_panda.jpg'))
-        [predictions, top_k] = run_inference_on_image(image)
+            os.path.join(FLAGS.model_dir, 'panda_decode.jpg'))
+        predictions = run_inference_on_image(image)
+        top_k = predictions.argsort()[-ranks:][::-1]
         node_lookup = NodeLookup()
-        top_k = predictions.argsort()[-FLAGS.num_top_predictions:][::-1]
         ret = OrderedDict()
         for node_id in top_k:
             human_string = node_lookup.id_to_string(node_id)
@@ -84,7 +72,7 @@ class HelloWorld(Resource):
             # print('%s (score = %.5f)' % (human_string, score))
         return ret
 
-api.add_resource(HelloWorld, '/')
+api.add_resource(HelloWorld, '/image_recognition/<string:imgb64>/<int:ranks>')
 
 class NodeLookup(object):
     """Converts integer node ID's to human readable labels."""
@@ -190,12 +178,12 @@ def run_inference_on_image(image):
         # Creates node ID --> English string lookup.
         # node_lookup = NodeLookup()
 
-        top_k = predictions.argsort()[-FLAGS.num_top_predictions:][::-1]
+        
         # for node_id in top_k:
         #     human_string = node_lookup.id_to_string(node_id)
         #     score = predictions[node_id]
         #     print('%s (score = %.5f)' % (human_string, score))
-        return [predictions, top_k]
+        return predictions
 
 
 def maybe_download_and_extract():
