@@ -54,7 +54,7 @@ DATA_URL = 'http://download.tensorflow.org/models/image/imagenet/inception-2015-
 app = Flask(__name__)
 api = Api(app)
 
-class HelloWorld(Resource):
+class ImageRecognition(Resource):
     def get(self, imgb64, ranks):
         image_64_decode = base64.urlsafe_b64decode(imgb64) 
         with open('{}/panda_decode.jpg'.format(FLAGS.model_dir), 'wb') as f: # create a writable image and write the decoding result
@@ -72,7 +72,7 @@ class HelloWorld(Resource):
             # print('%s (score = %.5f)' % (human_string, score))
         return ret
 
-api.add_resource(HelloWorld, '/image_recognition/<string:imgb64>/<int:ranks>')
+api.add_resource(ImageRecognition, '/image_recognition/<string:imgb64>/<int:ranks>')
 
 class NodeLookup(object):
     """Converts integer node ID's to human readable labels."""
