@@ -68,7 +68,7 @@ listen-address=169.254.1.1
 Then restart dnsmasq.
 
 ### Step 4: Querying Services
-Once the agent is started and the service is synced, we have to resolve dns query or connecting to Consul’s HTTP API.
+Once the agent is started and the service is synced, we have to resolve dns query and connecting to Consul’s HTTP API.
 
 #### HTTP API
 ` docker run --dns 169.254.1.1 myImage`
