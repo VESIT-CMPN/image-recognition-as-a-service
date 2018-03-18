@@ -92,9 +92,16 @@ class MainActivity : AppCompatActivity() {
                 encodedString = encodedString.replace('/', '_')
                 encodedString = encodedString.replace('+','-')
                 mImageView.setImageBitmap(imageBitmap)
-                val out = PrintWriter(File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "tmpimage.txt").absolutePath)
-                out.print(encodedString)
-                out.close()
+                apiController.getRegistry(){ response ->
+                    serviceAddress = response.get(serviceAddress)
+                    servicePort = Response.get(servicePort)
+                    apiController.getDocker(serviceAddress: serviceAddress,servicePort:servicePort,imagetobase64: encodedString, rank: 2){ response ->
+                    Log.d(TAG, "Response": $response)
+                }
+                }
+//                val out = PrintWriter(File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "tmpimage.txt").absolutePath)
+//                out.print(encodedString)
+//                out.close()
             } catch (e: IOException) {
                 e.printStackTrace()
             }
