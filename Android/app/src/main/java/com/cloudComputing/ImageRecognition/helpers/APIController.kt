@@ -18,7 +18,7 @@ class APIController constructor(serviceInjection: ServiceInterface){
         }
 
         fun getDocker(serviceAddress: String,servicePort: String, imagetobase64: String,rank: Int,completionHandler: (response: JSONObject?) -> Unit) {
-            val containerName = "image_recognition"
+            val containerName = "imagerecognition"
             val path = "http://$serviceAddress:$servicePort/$containerName/$imagetobase64/$rank"
             val params = JSONObject()
             service.get(path, params, completionHandler)
