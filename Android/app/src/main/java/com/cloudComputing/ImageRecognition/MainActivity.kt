@@ -11,6 +11,8 @@ import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
 import android.util.Base64
 import android.util.Log
+import com.cloudComputing.ImageRecognition.helpers.APIController
+import com.cloudComputing.ImageRecognition.helpers.VolleyService
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -56,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         button.setOnClickListener { dispatchTakePictureIntent() }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val imageFileName = "tmpimage.jpg"
             val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -86,18 +88,20 @@ class MainActivity : AppCompatActivity() {
 //                var encodedString = Base64.encodeToString(bytes, Base64.NO_WRAP)
 
                 val baos = ByteArrayOutputStream()
-                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos) //bm is the bitmap object
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 5  , baos) //bm is the bitmap object
                 val b = baos.toByteArray()
                 var encodedString = Base64.encodeToString(b, Base64.NO_WRAP)
                 encodedString = encodedString.replace('/', '_')
                 encodedString = encodedString.replace('+','-')
                 mImageView.setImageBitmap(imageBitmap)
-                apiController.getRegistry(){ response ->
-                    serviceAddress = response.get(serviceAddress)
-                    servicePort = Response.get(servicePort)
-                    apiController.getDocker(serviceAddress: serviceAddress,servicePort:servicePort,imagetobase64: encodedString, rank: 2){ response ->
-                    Log.d(TAG, "Response": $response)
-                }
+                val apiController = APIController(VolleyService())
+                apiController.getRegistry { response ->
+                    Log.d("res", "$response")
+                    val serviceAddress = response!!.get("ServiceAddress")
+                    val servicePort = response.get("ServicePort")
+                    apiController.getDocker(serviceAddress.toString(),servicePort.toString(), encodedString, 2){ res ->
+                        result.text = "$res"
+                    }
                 }
 //                val out = PrintWriter(File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "tmpimage.txt").absolutePath)
 //                out.print(encodedString)
